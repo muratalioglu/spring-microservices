@@ -1,0 +1,37 @@
+server:
+  port:
+    8888
+
+spring:
+  application:
+    name:
+      configserver
+
+  profiles:
+    active: vault
+
+  cloud:
+    config:
+      server:
+        vault:
+          port: 8200
+          host: 127.0.0.1
+          kvVersion: 2
+          token: myroot
+          backend: secret
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    registerWithEureka: false
+    fetchRegistry: false
+    serviceUrl:
+      defaultZone:
+        http://${eureka.instance.hostname}:${server.port}/eureka/
+  server:
+    waitTimeInMsWhenSyncEmpty: 5
+
+# vault paths
+# path: {{configserver}}/microservices-app/default
+# path: {{configserver}}/microservices-app/dev
