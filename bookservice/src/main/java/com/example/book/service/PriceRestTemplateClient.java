@@ -14,7 +14,7 @@ public class PriceRestTemplateClient {
     public Double getPrice(Integer productId) {
         ResponseEntity<Double> responseEntity =
                 restTemplate.getForEntity(
-                        String.format("http://price-service/v1/prices/%s", productId),
+                        String.format("http://priceservice/v1/prices/%s", productId),
                         Double.class
                 );
         return responseEntity.getBody();

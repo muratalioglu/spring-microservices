@@ -73,11 +73,15 @@ public class BookServiceImpl implements BookService {
         if (bookDTO == null)
             return null;
 
-        Double price = priceRestTemplateClient.getPrice(bookDTO.getId());
+        Double price = getPrice(bookDTO);
 
         bookDTO.setPrice(price);
 
         return bookDTO;
+    }
+
+    public Double getPrice(BookDTO bookDTO) {
+        return priceRestTemplateClient.getPrice(bookDTO.getId());
     }
 
     @Override

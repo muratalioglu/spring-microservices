@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: price-service
+    name: priceservice
     profiles:
       active: dev
 
