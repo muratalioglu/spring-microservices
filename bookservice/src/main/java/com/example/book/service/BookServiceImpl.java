@@ -2,6 +2,8 @@ package com.example.book.service;
 
 import com.example.book.dto.BookDTO;
 import com.example.book.dto.BookInDTO;
+import io.github.resilience4j.circuitbreaker.CircuitBreaker;
+import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 @Service
 public class BookServiceImpl implements BookService {
@@ -18,6 +21,9 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     PriceRestTemplateClient priceRestTemplateClient;
+
+    @Autowired
+    CircuitBreakerRegistry circuitBreakerRegistry;
 
     @PostConstruct
     private void loadBooks() {
@@ -81,7 +87,16 @@ public class BookServiceImpl implements BookService {
     }
 
     public Double getPrice(BookDTO bookDTO) {
-        return priceRestTemplateClient.getPrice(bookDTO.getId());
+
+        CircuitBreaker circuitBreaker = circuitBreakerRegistry.circuitBreaker("priceServiceCircuitBreaker");
+
+        Supplier<Double> supplier =
+                CircuitBreaker.decorateSupplier(
+                        circuitBreaker,
+                        () -> priceRestTemplateClient.getPrice(bookDTO.getId())
+                );
+
+        return circuitBreaker.executeSupplier(supplier);
     }
 
     @Override
