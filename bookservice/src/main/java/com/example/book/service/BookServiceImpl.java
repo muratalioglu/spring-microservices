@@ -2,15 +2,19 @@ package com.example.book.service;
 
 import com.example.book.dto.BookDTO;
 import com.example.book.dto.BookInDTO;
+import io.github.resilience4j.bulkhead.Bulkhead;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreaker;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.function.SupplierUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 @Service
@@ -21,6 +25,9 @@ public class BookServiceImpl implements BookService {
 
     @Autowired
     PriceRestTemplateClient priceRestTemplateClient;
+
+    @Autowired
+    BulkheadRegistry bulkheadRegistry;
 
     @Autowired
     CircuitBreakerRegistry circuitBreakerRegistry;
@@ -79,7 +86,7 @@ public class BookServiceImpl implements BookService {
         if (bookDTO == null)
             return null;
 
-        Double price = getPrice(bookDTO);
+        Double price = getPriceBulkhead(bookDTO);
 
         bookDTO.setPrice(price);
 
@@ -97,6 +104,19 @@ public class BookServiceImpl implements BookService {
                 );
 
         return circuitBreaker.executeSupplier(supplier);
+    }
+
+    public Double getPriceBulkhead(BookDTO bookDTO) {
+
+        Bulkhead bulkhead = bulkheadRegistry.bulkhead("priceServiceBulkhead");
+
+        Supplier<Double> supplier =
+                Bulkhead.decorateSupplier(
+                        bulkhead,
+                        () -> priceRestTemplateClient.getPrice(bookDTO.getId())
+                );
+
+        return bulkhead.executeSupplier(supplier);
     }
 
     @Override

@@ -29,4 +29,16 @@ public class PriceServiceImpl implements PriceService {
 
         return priceMap.get(productId);
     }
+
+    @Override
+    public Double getPriceBulkhead(Integer productId) {
+
+        try {
+            Thread.sleep(10000);
+        } catch (Exception ignored) {
+
+        }
+
+        return priceMap.get(productId);
+    }
 }

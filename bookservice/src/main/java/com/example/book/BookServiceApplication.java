@@ -1,5 +1,7 @@
 package com.example.book;
 
+import io.github.resilience4j.bulkhead.BulkheadConfig;
+import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry;
 import org.springframework.boot.SpringApplication;
@@ -43,5 +45,16 @@ public class BookServiceApplication {
 						.build();
 
 		return CircuitBreakerRegistry.of(circuitBreakerConfig);
+	}
+
+	@Bean
+	public BulkheadRegistry getBulkheadRegistry() {
+		BulkheadConfig bulkheadConfig =
+				BulkheadConfig.custom()
+						.maxConcurrentCalls(3)
+						.maxWaitDuration(Duration.ofMillis(2000))
+						.build();
+
+		return BulkheadRegistry.of(bulkheadConfig);
 	}
 }

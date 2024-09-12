@@ -16,7 +16,7 @@ public class PriceController {
     @GetMapping("/v1/prices/{productId}")
     public ResponseEntity<Double> getPrice(@PathVariable Integer productId) {
 
-        Double price = priceService.getPrice(productId);
+        Double price = priceService.getPriceBulkhead(productId);
         if (price == null)
             return ResponseEntity.noContent().build();
 
