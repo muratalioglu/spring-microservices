@@ -20,13 +20,6 @@ spring:
       discovery.locator:
         enabled: true
         lowerCaseServiceId: true
-      routes:
-        - id: priceservice
-          uri: lb://priceservice
-          predicates:
-            - Path=/price/**
-          filters:
-            - RewritePath=/price/(?<path>.*), /${path}
 
 eureka:
   instance:
