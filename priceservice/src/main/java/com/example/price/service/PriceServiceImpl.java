@@ -34,7 +34,7 @@ public class PriceServiceImpl implements PriceService {
     public Double getPriceBulkhead(Integer productId) {
 
         try {
-            Thread.sleep(10000);
+            Thread.sleep(3000);
         } catch (Exception ignored) {
 
         }
