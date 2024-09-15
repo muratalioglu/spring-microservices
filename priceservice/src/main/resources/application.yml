@@ -13,7 +13,6 @@ spring:
 eureka:
   instance:
     instance-id: ${spring.application.name}:${random.int(1000000)}
-    preferIpAddress: true
   client:
     registerWithEureka: true
     fetchRegistry: true
