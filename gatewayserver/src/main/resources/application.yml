@@ -1,0 +1,42 @@
+server:
+  port: 8072
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    gateway:
+      enabled: true
+
+spring:
+  application:
+    name: gateway-server
+  config:
+    import: configserver:http://localhost:8888
+  cloud:
+    gateway:
+      discovery.locator:
+        enabled: true
+        lowerCaseServiceId: true
+      routes:
+        - id: priceservice
+          uri: lb://priceservice
+          predicates:
+            - Path=/price/**
+          filters:
+            - RewritePath=/price/(?<path>.*), /${path}
+
+eureka:
+  instance:
+    instance-id: ${spring.application.name}:${random.int(1000000)}
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
