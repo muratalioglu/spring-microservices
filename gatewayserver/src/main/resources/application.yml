@@ -20,10 +20,15 @@ spring:
       discovery.locator:
         enabled: true
         lowerCaseServiceId: true
+      routes:
+        - id: priceservice
+          uri: lb://priceservice
+          predicates:
+            - Path=/prices/**
+          filters:
+            - RewritePath=/prices/?(?<path>.*), /$\{path}
 
 eureka:
-  instance:
-    instance-id: ${spring.application.name}:${random.int(1000000)}
   client:
     registerWithEureka: true
     fetchRegistry: true
