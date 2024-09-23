@@ -1,5 +1,6 @@
 package com.example.book;
 
+import com.example.gateway.filters.UserContextInterceptor;
 import io.github.resilience4j.bulkhead.BulkheadConfig;
 import io.github.resilience4j.bulkhead.BulkheadRegistry;
 import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
@@ -9,12 +10,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeoutException;
 
 @SpringBootApplication
@@ -28,7 +31,20 @@ public class BookServiceApplication {
 	@LoadBalanced
 	@Bean
 	public RestTemplate getRestTemplate() {
-		return new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate();
+		List<ClientHttpRequestInterceptor> interceptorList =
+				restTemplate.getInterceptors();
+
+		if (interceptorList.isEmpty())
+			restTemplate.setInterceptors(
+					List.of(new UserContextInterceptor())
+			);
+		else {
+			interceptorList.add(new UserContextInterceptor());
+			restTemplate.setInterceptors(interceptorList);
+		}
+
+		return restTemplate;
 	}
 
 	@Bean

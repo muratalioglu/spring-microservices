@@ -66,7 +66,13 @@
 			<artifactId>resilience4j-bulkhead</artifactId>
 			<version>${resilience4j.version}</version>
 		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>com.example</groupId>
+            <artifactId>gatewayserver</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+    </dependencies>
 
 	<build>
 		<plugins>
