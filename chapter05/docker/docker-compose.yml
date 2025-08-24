@@ -14,8 +14,9 @@ services:
         aliases:
           - "database"
     volumes:
-      - ./init.sql:/docker-entrypoint-initdb.d/1-init.sql
-      - ./data.sql:/docker-entrypoint-initdb.d/2.data.sql
+      - shared-pgdata:/var/lib/postgresql/data
+      - ./01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./02-data.sql:/docker-entrypoint-initdb.d/02.data.sql
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "postgres"]
       interval: 5s
@@ -53,3 +54,7 @@ services:
 networks:
   backend:
     driver: bridge
+
+volumes:
+  shared-pgdata:
+    external: true
