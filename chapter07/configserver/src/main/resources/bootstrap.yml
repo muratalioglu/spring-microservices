@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native, git
+  cloud:
+    config:
+      server:
+        native:
+          search-locations: classpath:/config/
+        git:
+          uri: https://github.com/muratalioglu/smia-config-server.git
+
+server:
+  port: 8071
+
+encrypt:
+  key: symm3tr1c
