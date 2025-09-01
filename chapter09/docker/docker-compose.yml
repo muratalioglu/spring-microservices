@@ -1,0 +1,60 @@
+version: '3.7'
+
+services:
+  database:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: uns3cur3p4ssw0rd
+      POSTGRES_DB: ostock_dev
+    networks:
+      backend:
+        aliases:
+          - "database"
+    volumes:
+      - shared-pgdata:/var/lib/postgresql/data
+      - ./01-init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./02-data.sql:/docker-entrypoint-initdb.d/02.data.sql
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+  configserver:
+    image: ostock/configserver:0.0.1-SNAPSHOT
+    ports:
+      - "8071:8071"
+    networks:
+      backend:
+        aliases:
+          - "configserver"
+    healthcheck:
+      test: ["CMD", "curl", "http://localhost:8071/actuator/health"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
+  licensingservice:
+    image: ostock/licensing-service:0.0.1-SNAPSHOT
+    ports:
+      - "8180:8080"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=dev"
+    networks:
+      backend:
+        aliases:
+          - "licenseservice"
+    depends_on:
+      database:
+        condition: service_healthy
+      configserver:
+        condition: service_healthy
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  shared-pgdata:
+    external: true
