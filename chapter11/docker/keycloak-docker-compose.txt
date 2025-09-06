@@ -1,0 +1,26 @@
+version: "3.8"
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    restart: always
+    environment:
+      # İlk admin kullanıcı (container’da zorunlu)
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Eski 6.x’e benzer URL yapısı için (kök yerine /auth)
+      KC_HTTP_RELATIVE_PATH: /auth
+      # Script tabanlı akışları etkinleştir (6.x’teki scripts/upload_scripts karşılığı)
+      KC_FEATURES: scripts
+    volumes:
+      # realm export’unu “sihirli” import klasörüne bağla
+      - ./realm-export.json:/opt/keycloak/data/import/realm-export.json:ro
+    command:
+      # Dev modda hızlı başlat + başlangıçta realm import et
+      - start-dev
+      - --import-realm
+    ports:
+      - "8080:8080"
+    networks:
+      backend:
+        aliases:
+          - keycloak

@@ -1,0 +1,5 @@
+(cd configserver && (mvn clean install))
+(cd eurekaserver && (mvn clean install))
+(cd gatewayserver && (mvn clean install))
+(cd licensing-service && (mvn clean install))
+(cd organization-service && (mvn clean install))
